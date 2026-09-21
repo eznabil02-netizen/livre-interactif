@@ -3,26 +3,38 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Livre Interactif</title>
-  <!-- React & Tailwind CSS via CDN -->
+  <title>Livre Interactif - English Class</title>
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body class="bg-slate-900 text-slate-100">
+<body class="bg-slate-900 text-slate-100 min-h-screen">
   <div id="root"></div>
 
   <script type="text/babel">
-    const { useState, useEffect } = React;
+    const { useState } = React;
 
     function App() {
       const [revealed, setRevealed] = useState({});
 
-      // Image du livre (remplacez l'URL si besoin)
-      const imageUrl = "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800";
+      // Utilisez 'page1.jpg' si vous l'avez téléversée sur GitHub, sinon ce lien charge une image de test
+      const imageUrl = "./page1.jpg"; 
+
+      // 1. MASQUES DE RÉPONSES (ajustés en % pour la page 1c)
+      const answers = [
+        { id: 'a1', x: 18, y: 25, w: 12, h: 3, text: 'British' },      // Exercice 1 (Hugh Grant)
+        { id: 'a2', x: 18, y: 46, w: 14, h: 3, text: 'American' },     // Exercice 3 (Burger)
+        { id: 'a3', x: 18, y: 81, w: 14, h: 3, text: 'Italian' },      // Exercice 6 (Venice)
+        { id: 'a4', x: 52, y: 28, w: 12, h: 3, text: '1. America' },   // Continents
+      ];
+
+      // 2. BOUTONS AUDIO (Prononciation)
+      const audioWords = [
+        { id: 'w1', x: 25, y: 13, text: 'Where in the world?' },
+        { id: 'w2', x: 52, y: 18, text: 'Label the continents' },
+        { id: 'w3', x: 18, y: 57, text: 'Flamenco dancing' },
+      ];
 
       const toggleAnswer = (id) => {
         setRevealed(prev => ({ ...prev, [id]: !prev[id] }));
@@ -38,35 +50,62 @@
       };
 
       return (
-        <div className="min-h-screen p-4 flex flex-col items-center">
-          <header className="mb-6 text-center">
-            <h1 className="text-2xl font-bold text-white">Livre d'apprentissage interactif</h1>
-            <p className="text-slate-400 text-sm">Cliquez sur l'œil pour la réponse ou sur l'audio pour écouter</p>
+        <div className="p-4 flex flex-col items-center">
+          <header className="mb-4 text-center">
+            <h1 className="text-xl font-bold text-indigo-400">1c - Where in the world?</h1>
+            <p className="text-xs text-slate-400 mt-1">
+              Cliquez sur les masques jaunes pour voir la réponse, ou sur 🔊 pour écouter.
+            </p>
           </header>
 
-          <div className="relative max-w-2xl w-full bg-slate-800 p-4 rounded-xl shadow-2xl border border-slate-700">
-            <div className="relative w-full overflow-hidden rounded-lg">
-              <img src={imageUrl} alt="Livre" className="w-full h-auto block select-none" />
+          <div className="relative max-w-2xl w-full bg-slate-800 p-2 rounded-xl shadow-2xl border border-slate-700 overflow-hidden">
+            <div className="relative w-full">
+              {/* Image de la page du livre */}
+              <img 
+                src={imageUrl} 
+                alt="Page du livre scannée" 
+                className="w-full h-auto block rounded"
+                onError={(e) => {
+                  // Image de secours si page1.jpg n'est pas encore trouvée
+                  e.target.src = "https://picsum.photos/800/1100";
+                }}
+              />
 
-              {/* Exemple de zone de réponse masquée */}
-              <div style={{ left: '30%', top: '40%', width: '25%', height: '6%' }} className="absolute flex items-center gap-1">
-                <button 
-                  onClick={() => toggleAnswer('q1')}
-                  className="bg-amber-500 text-slate-950 font-bold px-2 py-1 rounded text-xs w-full text-center hover:bg-amber-400"
+              {/* COUCHE DES RÉPONSES MASQUÉES */}
+              {answers.map((item) => (
+                <div
+                  key={item.id}
+                  style={{
+                    left: `${item.x}%`,
+                    top: `${item.y}%`,
+                    width: `${item.w}%`,
+                    height: `${item.h}%`,
+                  }}
+                  onClick={() => toggleAnswer(item.id)}
+                  className={`absolute cursor-pointer rounded flex items-center justify-center font-bold text-xs transition-all border ${
+                    revealed[item.id]
+                      ? 'bg-emerald-500 text-slate-950 border-emerald-300'
+                      : 'bg-amber-400 text-slate-950 border-amber-300 hover:bg-amber-300'
+                  }`}
                 >
-                  {revealed['q1'] ? "British" : "[ Voir la réponse ]"}
-                </button>
-              </div>
+                  {revealed[item.id] ? item.text : "👁️ Réponse"}
+                </div>
+              ))}
 
-              {/* Exemple de bouton audio */}
-              <div style={{ left: '30%', top: '25%' }} className="absolute">
-                <button 
-                  onClick={() => speak('Where in the world?')}
-                  className="bg-cyan-500 hover:bg-cyan-400 text-slate-950 px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg"
+              {/* COUCHE DES BOUTONS AUDIO */}
+              {audioWords.map((item) => (
+                <button
+                  key={item.id}
+                  style={{
+                    left: `${item.x}%`,
+                    top: `${item.y}%`,
+                  }}
+                  onClick={() => speak(item.text)}
+                  className="absolute bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-2 py-0.5 rounded-full text-[10px] shadow-lg flex items-center gap-1 -translate-y-1/2"
                 >
                   🔊 Écouter
                 </button>
-              </div>
+              ))}
             </div>
           </div>
         </div>

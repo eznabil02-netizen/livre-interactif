@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Livre Interactif</title>
+  <!-- React & Tailwind CSS via CDN -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-900 text-slate-100">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    function App() {
+      const [revealed, setRevealed] = useState({});
+
+      // Image du livre (remplacez l'URL si besoin)
+      const imageUrl = "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800";
+
+      const toggleAnswer = (id) => {
+        setRevealed(prev => ({ ...prev, [id]: !prev[id] }));
+      };
+
+      const speak = (text) => {
+        if ('speechSynthesis' in window) {
+          window.speechSynthesis.cancel();
+          const u = new SpeechSynthesisUtterance(text);
+          u.lang = 'en-US';
+          window.speechSynthesis.speak(u);
+        }
+      };
+
+      return (
+        <div className="min-h-screen p-4 flex flex-col items-center">
+          <header className="mb-6 text-center">
+            <h1 className="text-2xl font-bold text-white">Livre d'apprentissage interactif</h1>
+            <p className="text-slate-400 text-sm">Cliquez sur l'œil pour la réponse ou sur l'audio pour écouter</p>
+          </header>
+
+          <div className="relative max-w-2xl w-full bg-slate-800 p-4 rounded-xl shadow-2xl border border-slate-700">
+            <div className="relative w-full overflow-hidden rounded-lg">
+              <img src={imageUrl} alt="Livre" className="w-full h-auto block select-none" />
+
+              {/* Exemple de zone de réponse masquée */}
+              <div style={{ left: '30%', top: '40%', width: '25%', height: '6%' }} className="absolute flex items-center gap-1">
+                <button 
+                  onClick={() => toggleAnswer('q1')}
+                  className="bg-amber-500 text-slate-950 font-bold px-2 py-1 rounded text-xs w-full text-center hover:bg-amber-400"
+                >
+                  {revealed['q1'] ? "British" : "[ Voir la réponse ]"}
+                </button>
+              </div>
+
+              {/* Exemple de bouton audio */}
+              <div style={{ left: '30%', top: '25%' }} className="absolute">
+                <button 
+                  onClick={() => speak('Where in the world?')}
+                  className="bg-cyan-500 hover:bg-cyan-400 text-slate-950 px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg"
+                >
+                  🔊 Écouter
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
